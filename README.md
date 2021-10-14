@@ -10,4 +10,5 @@ Follow this [link](https://weijieesim.shinyapps.io/Stock_Market_vs_Covid19/) for
 ![Shiny app interface](www/app_image.png)
 
 ## Contact
+[Portfolio Website](https://weijiesim.github.io/#)
 wjsim00@gmail.com
