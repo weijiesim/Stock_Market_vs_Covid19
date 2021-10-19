@@ -41,17 +41,17 @@ ui <- navbarPage(
         sidebarLayout(
             sidebarPanel(
                 title = "Inputs",
-                h4("Type in a stock ticker and select a country's covid data to see if they're correlated!"),
-                textInput("symb", strong("Ticker:"), "^STI"),
+                h3("Type in a stock ticker and select a country's covid data to see if they're correlated!"),
+                textInput("symb", strong("Ticker:", style = "font-size: 20px;"), "^STI"),
                 selectInput("country",
-                            strong("Choose a Country for New COVID Cases:"),
+                            strong("Choose a Country for New COVID Cases:", style = "font-size: 20px;"),
                             unique(covid_df$location),
                             selected = "World"),
-                strong("Additional information:", style = "font-size: 14px;"),
+                strong("Additional information:", style = "font-size: 15px;"),
                 tags$ul(
                     tags$li("Stock tickers must match that of", tags$a(href = "https://sg.finance.yahoo.com/","Yahoo Finance.")),
                     tags$li("Click and drag on chart to zoom in. Double click to zoom out."),
-                    style = "font-size: 14px;"
+                    style = "font-size: 15px;"
                 )
             ),
             mainPanel(
@@ -77,7 +77,7 @@ ui <- navbarPage(
                            "This is a simple app that visualises stock market performance against Covid-19 cases from different countries.",
                            br(),
                            br(),
-                           "Created by " ,tags$a(href = "https://www.linkedin.com/in/wei-jie-sim/" ,"Wei Jie"), " with R Shiny",
+                           "Created by " ,tags$a(href = "https://github.com/weijiesim/Stock_Market_vs_Covid19" ,"Wei Jie"), " with R Shiny",
                            br(),
                            br(),
                            "Source: Our World in Data, Yahoo Finance"
@@ -88,15 +88,30 @@ ui <- navbarPage(
 
 server <- function(input, output){
     dataInput <- reactive({
+        
         stock_data <- getSymbols(input$symb, src = "yahoo",
                                  auto.assign = FALSE)
         
-        covid_data <- filter(covid_df, location == input$country) # allow users to choose country covid data
+        stock_data_ts <- na.locf(stock_data[, 4]) # replacing NAs with last value carried forward and selecting close prices
+        
+        covid_data <- covid_df %>%
+            filter(location == input$country) %>% # allow users to filter country covid data
+            select(`date`, `New Cases Smoothed`) # selecting New Cases column
         
         covid_data_ts <- xts(covid_data, order.by = covid_data$date)
         
-        combined_ts <- cbind(last(stock_data[, 4], '3 years'), covid_data_ts[, 6])
+        merge.xts(covid_data_ts, stock_data_ts, join = 'inner')[, -1]
         
+    })
+    
+    start_of_covid <- reactive({
+        dates <- covid_df %>%
+            filter(location == input$country, `New Cases Smoothed` > 0) %>%
+            mutate(date = as.character(date)) %>%
+            mutate(date = as.POSIXct(date)) %>%
+            select(date)
+        
+        dates[4,1]
     })
     
     sdt_title <- reactive({
@@ -147,12 +162,11 @@ server <- function(input, output){
         dygraph(dataInput(), main = graph_title()) %>%
             dyAxis("y", label = graph_axis()) %>%
             dyAxis("y2", label = "New COVID Cases (000's)") %>%
-            dySeries("New.Cases.Smoothed", axis = "y2") %>%
-            dyEvent("2019-12-31", "Start of Covid19", labelLoc = "bottom") %>%
+            dySeries("New.Cases.Smoothed", axis = "y2", label = "New Covid Cases") %>%
+            dyEvent(start_of_covid(), "Start of Covid19", labelLoc = "bottom", strokePattern = "dotted") %>%
             dyOptions(drawGrid = FALSE,
                       digitsAfterDecimal = 0,
-                      colors = c("#1DAD93", "#2C3E4F")) %>%
-            dyRangeSelector()
+                      colors = c("#1DAD93", "#2C3E4F"))
     })
     
 }
