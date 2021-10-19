@@ -30,7 +30,7 @@ ui <- navbarPage(
         bootswatch = "flatly",
         base_font = font_google("Economica"),
         heading_font = font_google("Economica"),
-        font_scale = 1.1
+        font_scale = 1.2
     ),
     
     title = "Stock Market vs Covid-19",
@@ -41,18 +41,19 @@ ui <- navbarPage(
         sidebarLayout(
             sidebarPanel(
                 title = "Inputs",
-                h3("Type in a stock ticker and select a country's covid data to see if they're correlated!"),
-                textInput("symb", strong("Ticker:", style = "font-size: 20px;"), "^STI"),
+                strong("Type in a stock ticker and select a country's covid data to see if they're correlated!",
+                       style = "font-size: 30px;"),
+                textInput("symb", strong("Ticker:", style = "font-size: 22px;"), "SPY"),
                 selectInput("country",
-                            strong("Choose a Country for New COVID Cases:", style = "font-size: 20px;"),
+                            strong("Choose a Country for New COVID Cases:", style = "font-size: 22px;"),
                             unique(covid_df$location),
                             selected = "World"),
-                strong("Additional information:", style = "font-size: 15px;"),
+                strong("Additional information:", style = "font-size: 17px;"),
                 tags$ul(
                     tags$li("Stock tickers must match that of", tags$a(href = "https://sg.finance.yahoo.com/","Yahoo Finance.")),
                     tags$li("Click and drag on chart to zoom in. Double click to zoom out."),
-                    style = "font-size: 15px;"
-                )
+                    style = "font-size: 16px;"
+                ),
             ),
             mainPanel(
                 tabsetPanel(
