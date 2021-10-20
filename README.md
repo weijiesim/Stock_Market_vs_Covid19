@@ -5,9 +5,10 @@ Covid19 input data are obtained from [Our World in Data](https://github.com/owid
 
 ## Shiny Interface
 
-Follow this [link](https://weijieesim.shinyapps.io/Stock_Market_vs_Covid19/) for the Shiny app. A screenshot of the interface is as shown below.
+Follow this [link](https://weijieesim.shinyapps.io/Stock_Market_vs_Covid19/) for the Shiny app. Screenshots of the interface are shown below.
 
-![Shiny app interface](www/app_image.png)
+![Shiny app interface](www/app_plot.png)
+![Shiny app interface](www/app_table.png)
 
 ## Contact
 [Portfolio Website](https://weijiesim.github.io/#)
