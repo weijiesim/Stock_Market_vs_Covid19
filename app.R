@@ -93,15 +93,13 @@ server <- function(input, output){
         stock_data <- getSymbols(input$symb, src = "yahoo",
                                  auto.assign = FALSE)
         
-        stock_data_ts <- na.locf(stock_data[, 4]) # replacing NAs with last value carried forward and selecting close prices
-        
         covid_data <- covid_df %>%
             filter(location == input$country) %>% # allow users to filter country covid data
             select(`date`, `New Cases Smoothed`) # selecting New Cases column
         
         covid_data_ts <- xts(covid_data, order.by = covid_data$date)
         
-        merge.xts(covid_data_ts, stock_data_ts, join = 'inner')[, -1]
+        merge.xts(last(stock_data[, 4], '3 years'), covid_data_ts[, 2], join = 'left')
         
     })
     
@@ -112,7 +110,7 @@ server <- function(input, output){
             mutate(date = as.POSIXct(date)) %>%
             select(date)
         
-        dates[4,1]
+        dates[1,1]
     })
     
     sdt_title <- reactive({
@@ -126,7 +124,7 @@ server <- function(input, output){
     stockDataTableInput <- reactive({
         stock_data <- getSymbols(input$symb, src = "yahoo",
                                  auto.assign = FALSE)
-        stock_data_df <- data.frame(date = index(stock_data), coredata(stock_data))
+        stock_data_df <- data.frame(date = index(last(stock_data, '3 years')), coredata(last(stock_data, '3 years')))
     })
     
     covidDataTableInput <- reactive({
@@ -164,7 +162,7 @@ server <- function(input, output){
             dyAxis("y", label = graph_axis()) %>%
             dyAxis("y2", label = "New COVID Cases (000's)") %>%
             dySeries("New.Cases.Smoothed", axis = "y2", label = "New Covid Cases") %>%
-            dyEvent(start_of_covid(), "Start of Covid19", labelLoc = "bottom", strokePattern = "dotted") %>%
+            dyEvent(start_of_covid(), "Start of Covid-19", labelLoc = "bottom", strokePattern = "dotted") %>%
             dyOptions(drawGrid = FALSE,
                       digitsAfterDecimal = 0,
                       colors = c("#1DAD93", "#2C3E4F"))
