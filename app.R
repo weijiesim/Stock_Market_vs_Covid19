@@ -159,7 +159,7 @@ server <- function(input, output){
     
     output$plot <- renderDygraph({
         dygraph(dataInput(), main = graph_title()) %>%
-            dyAxis("y", label = graph_axis()) %>%
+            dyAxis("y", label = graph_axis(), axisLabelColor = "#1DAD93") %>%
             dyAxis("y2", label = "New COVID Cases (000's)") %>%
             dySeries("New.Cases.Smoothed", axis = "y2", label = "New Covid Cases") %>%
             dyEvent(start_of_covid(), "Start of Covid-19", labelLoc = "bottom", strokePattern = "dotted") %>%
